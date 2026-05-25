@@ -41,8 +41,6 @@ df[["Price_x", "Price_y"]].corr()
 X = df[["Price_y", "Change %", "days"]]
 y = df["Price_x"]
 
-
-
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
@@ -54,18 +52,24 @@ y_pred = model.predict(X_test)
 fig, ax1 = plt.subplots()
 
 # Oljepris (vänster axel)
-ax1.plot(df["Date"], df["Price_x"], color="blue", label="Oil Price")
-ax1.set_ylabel("Oil Price", color="blue")
-ax1.tick_params(axis="y", labelcolor="blue")
+# ax1.plot(df["Date"], df["Price_x"], color="blue", label="Oil Price")
+# ax1.set_ylabel("Oil Price", color="blue")
+# ax1.tick_params(axis="y", labelcolor="blue")
 
-# USD-index (höger axel)
-ax2 = ax1.twinx()
-ax2.plot(df["Date"], df["Price_y"], color="red", label="USD Index")
-ax2.set_ylabel("USD Index", color="red")
-ax2.tick_params(axis="y", labelcolor="red")
+# # USD-index (höger axel)
+# ax2 = ax1.twinx()
+# ax2.plot(df["Date"], df["Price_y"], color="red", label="USD Index")
+# ax2.set_ylabel("USD Index", color="red")
+# ax2.tick_params(axis="y", labelcolor="red")
 
-plt.title("Oil Price vs USD Index")
-plt.show()
+# plt.title("Oil Price vs USD Index")
+# plt.show()
 
-# print(f"Mean Squared Error: {mean_squared_error(y_test, y_pred)}")
-# print(f"R^2 Score: {r2_score(y_test, y_pred)}")
+print(f"Mean Squared Error: {mean_squared_error(y_test, y_pred)}")
+print(f"R^2 Score: {r2_score(y_test, y_pred)}")
+
+print("Predicted vs Actual Oil Prices:")
+for pred, actual in zip(y_pred[:10], y_test[:10]):
+    print(f"Predicted: {pred:.2f}, Actual: {actual:.2f}") 
+
+# print(f"Prediction for new data: {model.predict([[110, 0.5, 9000]])[0]:.2f}")
