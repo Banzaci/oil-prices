@@ -7,6 +7,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 import numpy as np
 from prophet import Prophet
 import yfinance as yf
+import matplotlib.pyplot as plt
 
 # Denna funtion räknar ut hur många dagar det är från det tidigaste datumet i df_oil till ett givet datum. Dagens datum är default
 def days_from_start(df_oil, date_str=None):
@@ -164,23 +165,23 @@ print(results.head(10)) # 10 staplar
 # Mönster (t.ex. en bågform) tyder på att linjär regression missar något systematiskt.
 residuals = y_test - y_pred
 
-# plt.figure()
-# plt.scatter(y_pred, residuals, s=5)
-# plt.axhline(0, color="red")
-# plt.title("Residuals (Prediction Errors)")
-# plt.xlabel("Predicted Oil Price")
-# plt.ylabel("Error (Actual - Predicted)")
-# plt.show()
+plt.figure()
+plt.scatter(y_pred, residuals, s=5)
+plt.axhline(0, color="red")
+plt.title("Residuals (Prediction Errors)")
+plt.xlabel("Predicted Oil Price")
+plt.ylabel("Error (Actual - Predicted)")
+plt.show()
 
-# # Scatter: faktiskt vs förutsagt oljepris.
-# # Punkter nära den diagonala linjen innebär att modellen träffar bra.
-# plt.figure()
-# plt.scatter(y_test, y_pred, s=5)
-# plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], color="red", lw=1)
-# plt.xlabel("Actual Oil Price")
-# plt.ylabel("Predicted Oil Price")
-# plt.title("Actual vs Predicted Oil Price")
-# plt.show()
+# Scatter: faktiskt vs förutsagt oljepris.
+# Punkter nära den diagonala linjen innebär att modellen träffar bra.
+plt.figure()
+plt.scatter(y_test, y_pred, s=5)
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], color="red", lw=1)
+plt.xlabel("Actual Oil Price")
+plt.ylabel("Predicted Oil Price")
+plt.title("Actual vs Predicted Oil Price")
+plt.show()
 
 # Koefficienterna visar hur mycket oljepriset förändras (i USD) när en feature
 # ökar med 1 enhet, givet att övriga features hålls konstanta.
@@ -210,9 +211,11 @@ prediction = predict_oil_price(
     days
 )
 
-checking_date = "2022-11-14"
+CHECKING_DATE = "2022-11-14"
+# Bara testar runt lite här.
+# Kommer fortsätta jobba på detta projekt då jag finner det intressant
 
-future_days = days_from_start(df_oil, checking_date)
+future_days = days_from_start(df_oil, CHECKING_DATE)
 print("Predicted oil price:", prediction)
 
 future_days_price = predict_oil_price(105, 0.0, future_days)
@@ -224,9 +227,9 @@ if brent is None or brent.empty or "Close" not in brent.columns:
 else:
     close = brent[("Close", "BZ=F")]
     brent.columns = brent.columns.get_level_values(0)
-    date = pd.to_datetime(checking_date)
+    date = pd.to_datetime(CHECKING_DATE)
     if date in brent.index:
         print("Brent oil prices:", brent.loc[date, "Close"])
     else:
         print("N/A")
-    print(f"Predicted oil price on {checking_date}:", future_days_price)
+    print(f"Predicted oil price on {CHECKING_DATE}:", future_days_price)
