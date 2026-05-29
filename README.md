@@ -121,13 +121,9 @@ Inga saknade värden hittades efter join-operationen.
 
 ## Vald modell
 
-Projektet använder:
-
 ```python
-LinearRegression
+Projektet använder både linjär regression och Random Forest Regression.
 ```
-
-från Scikit-learn.
 
 ## Motivering
 
@@ -171,7 +167,7 @@ Ingen normalisering användes eftersom vanlig linjär regression utan regularise
 
 ## Tolkning av resultaten
 
-Ett R²-värde på:
+Ett R2-värde på:
 
 ```text
 0.57
@@ -192,6 +188,25 @@ RMSE på cirka:
 ```
 
 ---
+
+## Jämförelse med Random Forest Regression
+
+En Random Forest-modell testades också för att jämföra resultaten med linjär regression.
+
+Random Forest gav ett RMSE-värde på ungefär:
+
+```text
+1.74 USD/barrel
+```
+
+vilket var betydligt lägre än den linjära regressionens:
+
+```text
+19.3 USD/barrel
+```
+
+Det tyder på att sambandet mellan variablerna inte är helt linjärt och att mer flexibla modeller kan fånga mönster som linjär regression missar.
+
 
 # 9. Modellkoefficienter
 
@@ -300,10 +315,7 @@ Residualplotten visar tydliga mönster:
 
 ---
 
-## felets storlek varierar beroende på prisnivå
-
 Residualanalysen visar att felets storlek varierar beroende på prisnivå, vilket indikerar att modellen inte fångar sambandet fullt ut.
-
 
 ---
 

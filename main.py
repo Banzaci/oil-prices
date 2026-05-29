@@ -166,23 +166,23 @@ print(results.head(10)) # 10 staplar
 # Mönster (t.ex. en bågform) tyder på att linjär regression missar något systematiskt.
 residuals = y_test - y_pred
 
-# plt.figure()
-# plt.scatter(y_pred, residuals, s=5)
-# plt.axhline(0, color="red")
-# plt.title("Residuals (Prediction Errors)")
-# plt.xlabel("Predicted Oil Price")
-# plt.ylabel("Error (Actual - Predicted)")
-# plt.show()
+plt.figure()
+plt.scatter(y_pred, residuals, s=5)
+plt.axhline(0, color="red")
+plt.title("Residuals (Prediction Errors)")
+plt.xlabel("Predicted Oil Price")
+plt.ylabel("Error (Actual - Predicted)")
+plt.show()
 
-# # Scatter: faktiskt vs förutsagt oljepris.
-# # Punkter nära den diagonala linjen innebär att modellen träffar bra.
-# plt.figure()
-# plt.scatter(y_test, y_pred, s=5)
-# plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], color="red", lw=1)
-# plt.xlabel("Actual Oil Price")
-# plt.ylabel("Predicted Oil Price")
-# plt.title("Actual vs Predicted Oil Price")
-# plt.show()
+# Scatter: faktiskt vs förutsagt oljepris.
+# Punkter nära den diagonala linjen innebär att modellen träffar bra.
+plt.figure()
+plt.scatter(y_test, y_pred, s=5)
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], color="red", lw=1)
+plt.xlabel("Actual Oil Price")
+plt.ylabel("Predicted Oil Price")
+plt.title("Actual vs Predicted Oil Price")
+plt.show()
 
 # Koefficienterna visar hur mycket oljepriset förändras (i USD) när en feature
 # ökar med 1 enhet, givet att övriga features hålls konstanta.
