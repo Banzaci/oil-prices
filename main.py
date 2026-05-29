@@ -8,6 +8,7 @@ import numpy as np
 from prophet import Prophet
 import yfinance as yf
 import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestRegressor
 
 # Denna funtion räknar ut hur många dagar det är från det tidigaste datumet i df_oil till ett givet datum. Dagens datum är default
 def days_from_start(df_oil, date_str=None):
@@ -80,11 +81,11 @@ dfPredict = df_oil[["Date", "Price"]].rename(columns={
     "Price": "y"
 })
 
-model = Prophet()
-model.fit(dfPredict)
-future = model.make_future_dataframe(periods=30)  # 30 dagar framåt
-forecast = model.predict(future)
-model.plot(forecast)
+prophet_model = Prophet()
+prophet_model.fit(dfPredict)
+future = prophet_model.make_future_dataframe(periods=30)  # 30 dagar framåt
+forecast = prophet_model.predict(future)
+prophet_model.plot(forecast)
 print("Prophet forecast for next 10 days:")
 print(forecast[["ds", "yhat", "yhat_lower", "yhat_upper"]].tail(10))
 
@@ -113,22 +114,22 @@ X_train, X_test, y_train, y_test = train_test_split(
 # -------------------------
 # Linjär regression försöker hitta den räta linje (hyperplan i 3D) som
 # minimerar summan av kvadratiska fel mot träningsdatat. (Regression eftersom jag förutsäger ett kontinuerligt pris.)
-model = LinearRegression()
-model.fit(X_train, y_train)  # Modellen tränas på träningsdata
+lr_model = LinearRegression()
+lr_model.fit(X_train, y_train)  # Modellen tränas på träningsdata
 
 # -------------------------
 # PREDICTION
 # -------------------------
 # Kör modellen på testdatan för att få förutsägelser.
 # y_pred innehåller de förutspådda oljepriserna.
-y_pred = model.predict(X_test)
+y_pred = lr_model.predict(X_test)
 
 # Hjälpfunktion för att testa enskilda scenarion.
 # Skapar en DataFrame med samma kolumnnamn som träningsdata, vilket krävs av sklearn.
 def predict_oil_price(usd_price, change_pct, days):
     X_new = pd.DataFrame([[usd_price, change_pct, days]],
                          columns=["usd_price", "Change %", "days"])
-    return model.predict(X_new)[0]
+    return lr_model.predict(X_new)[0]
 
 # Tre scenarion: stark dollar, svag dollar, neutral.
 # En stark dollar brukar historiskt sett korrelera med lägre oljepriser (och vice versa).
@@ -165,23 +166,23 @@ print(results.head(10)) # 10 staplar
 # Mönster (t.ex. en bågform) tyder på att linjär regression missar något systematiskt.
 residuals = y_test - y_pred
 
-plt.figure()
-plt.scatter(y_pred, residuals, s=5)
-plt.axhline(0, color="red")
-plt.title("Residuals (Prediction Errors)")
-plt.xlabel("Predicted Oil Price")
-plt.ylabel("Error (Actual - Predicted)")
-plt.show()
+# plt.figure()
+# plt.scatter(y_pred, residuals, s=5)
+# plt.axhline(0, color="red")
+# plt.title("Residuals (Prediction Errors)")
+# plt.xlabel("Predicted Oil Price")
+# plt.ylabel("Error (Actual - Predicted)")
+# plt.show()
 
-# Scatter: faktiskt vs förutsagt oljepris.
-# Punkter nära den diagonala linjen innebär att modellen träffar bra.
-plt.figure()
-plt.scatter(y_test, y_pred, s=5)
-plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], color="red", lw=1)
-plt.xlabel("Actual Oil Price")
-plt.ylabel("Predicted Oil Price")
-plt.title("Actual vs Predicted Oil Price")
-plt.show()
+# # Scatter: faktiskt vs förutsagt oljepris.
+# # Punkter nära den diagonala linjen innebär att modellen träffar bra.
+# plt.figure()
+# plt.scatter(y_test, y_pred, s=5)
+# plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], color="red", lw=1)
+# plt.xlabel("Actual Oil Price")
+# plt.ylabel("Predicted Oil Price")
+# plt.title("Actual vs Predicted Oil Price")
+# plt.show()
 
 # Koefficienterna visar hur mycket oljepriset förändras (i USD) när en feature
 # ökar med 1 enhet, givet att övriga features hålls konstanta.
@@ -189,7 +190,7 @@ plt.show()
 print("\nFeature importance (sorted by absolute coefficient):")
 importance = pd.DataFrame({
     "feature": X.columns,
-    "coefficient": model.coef_
+    "coefficient": lr_model.coef_
 })
 importance = importance.sort_values("coefficient", key=abs, ascending=False)
 print(importance)
@@ -210,6 +211,22 @@ prediction = predict_oil_price(
     latest_change,
     days
 )
+
+# Random Forest används som en mer flexibel modell jämfört med linjär regression
+# Den bygger flera beslutsträd och tar medelvärdet av deras prediktioner
+rf = RandomForestRegressor(n_estimators=100, random_state=42)
+
+# Tränar modellen på samma träningsdata som den linjära modellen
+rf.fit(X_train, y_train)
+
+# Gör förutsägelser på testdatan
+rf_pred = rf.predict(X_test)
+
+# Räknar ut RMSE för att kunna jämföra direkt med linjär regression
+rf_rmse = np.sqrt(mean_squared_error(y_test, rf_pred))
+
+print("Linear RMSE:", rmse)
+print("Random Forest RMSE:", rf_rmse) # Random Forest presterar har ca 11 gånger bättre precision gentemot Linear
 
 CHECKING_DATE = "2022-11-14"
 # Bara testar runt lite här.

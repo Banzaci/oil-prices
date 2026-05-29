@@ -300,17 +300,10 @@ Residualplotten visar tydliga mönster:
 
 ---
 
-## Heteroskedasticitet
+## felets storlek varierar beroende på prisnivå
 
-Residualerna har inte konstant varians.
+Residualanalysen visar att felets storlek varierar beroende på prisnivå, vilket indikerar att modellen inte fångar sambandet fullt ut.
 
-Detta kallas:
-
-```text
-heteroskedasticitet
-```
-
-och tyder på att sambandet inte är linjärt.
 
 ---
 
